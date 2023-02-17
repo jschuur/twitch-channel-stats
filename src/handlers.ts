@@ -6,8 +6,15 @@ import pc from 'picocolors';
 import isCommand from './events/command';
 import { isDrop, isLanded } from './events/drop';
 import isMeme from './events/meme';
+import BatchProcess, { BatchCallback } from './lib/batch';
 import { saveEvents } from './lib/lib';
 import { log } from './lib/util';
+
+// batch queue will save events every 10 seconds or when it reaches 50 events
+const batch = new BatchProcess(saveEvents as BatchCallback, {
+  maxSize: 50,
+  maxTime: 10000,
+});
 
 export function setupChatHandlers(client: ChatClient) {
   client.onMessage(onMessage);
@@ -61,7 +68,7 @@ export async function onMessage(channel: string, username: string, text: string,
 
   // treat it as a regular chat message
   if (boolean(process.env.SAVE_MSG_LENGTHS)) {
-    saveEvents({ type: 'msg', channel, username, context: { msgLength: text?.length || 0 } });
+    batch.add({ type: 'msg', channel, username, context: { msgLength: text?.length || 0 } });
   }
   log('msg', channel, `${username}: ${text}`);
 }

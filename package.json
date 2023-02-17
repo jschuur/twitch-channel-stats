@@ -5,8 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start:tmi": "node src/bot-tmi.js",
-    "start:ws": "node src/bot-ws.js"
+    "start": "node src/bot.js"
   },
   "keywords": [],
   "author": "",
