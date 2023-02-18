@@ -1,0 +1,9 @@
+# fly.toml file generated for twitch-chat-stats on 2023-02-18T09:51:23Z
+
+app = "twitch-chat-stats"
+kill_signal = "SIGINT"
+kill_timeout = 5
+processes = []
+
+[experimental]
+  auto_rollback = true

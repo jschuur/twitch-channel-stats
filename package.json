@@ -6,8 +6,11 @@
   "type": "module",
   "scripts": {
     "start": "node dist/bot.js",
+    "start:docker": "docker compose up --build",
     "dev": "tsc --watch",
     "build": "tsc",
+    "deploy": "flyctl launch",
+    "deploy:secrets": "cat .env.production | grep '^[^#;]' | sed 's/\"//g' | flyctl secrets import"
   },
   "keywords": [],
   "author": "",
