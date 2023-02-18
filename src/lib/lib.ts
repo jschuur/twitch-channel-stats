@@ -2,12 +2,11 @@ import { boolean } from 'boolean';
 import _ from 'lodash';
 const { pick } = _;
 
-import { ChatEvents, CliOptions } from './types';
+import { savedContextFields } from '../config/config.js';
+import { ChatEvents, CliOptions } from './types.js';
 
-import { savedContextFields } from '../config';
-
-import saveToDB from '../stores/db';
-import saveToTinyBird from '../stores/tinybird';
+import saveToDB from '../stores/db.js';
+import saveToTinyBird from '../stores/tinybird.js';
 
 export async function saveEvents(payload: ChatEvents) {
   if (boolean(process.env.DISABLE_EVENT_SAVING)) return;

@@ -1,4 +1,4 @@
-import knownMemes from '../../config/memes.json';
+import knownMemes from '../config/memes.js';
 
 export default function isMeme(text: string) {
   return knownMemes.find((m) =>

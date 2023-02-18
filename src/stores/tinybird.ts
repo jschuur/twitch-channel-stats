@@ -1,6 +1,5 @@
-import { ChatEvent } from '../lib/types';
-
-import { debug } from '../lib/util';
+import { ChatEvent } from '../lib/types.js';
+import { debug } from '../lib/util.js';
 
 export default async function saveToTinyBird(events: ChatEvent[]) {
   const headers = {

@@ -5,7 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node src/bot.js"
+    "start": "node dist/bot.js",
+    "dev": "tsc --watch",
+    "build": "tsc",
   },
   "keywords": [],
   "author": "",

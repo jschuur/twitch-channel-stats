@@ -1,8 +1,7 @@
 import { boolean } from 'boolean';
 import pc from 'picocolors';
 
-import { ChatEventType } from './types';
-
+import { ChatEventType } from './types.js';
 export function log(type: ChatEventType, channel: string, msg: string) {
   const date = new Date();
   const time = date.toLocaleTimeString('en-GB');

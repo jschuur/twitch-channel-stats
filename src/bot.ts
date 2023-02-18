@@ -4,11 +4,9 @@ import { boolean } from 'boolean';
 import 'dotenv/config';
 import minimost from 'minimost';
 
-import { CliOptions } from './lib/types';
-
-import { validateOptions } from './lib/lib';
-import { authenticateTwitch, connectChat } from './twitch';
-
+import { startupMessages, validateOptions } from './lib/lib.js';
+import { CliOptions } from './lib/types.js';
+import { authenticateTwitch, connectChat } from './twitch.js';
 declare global {
   // eslint-disable-next-line no-var
   var options: CliOptions;

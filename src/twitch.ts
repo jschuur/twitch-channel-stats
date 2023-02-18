@@ -6,9 +6,8 @@ import { AuthProvider } from '@twurple/auth';
 import ora from 'ora';
 import pc from 'picocolors';
 
-import { setupChatHandlers } from './handlers';
-import { saveEvents } from './lib/lib';
-
+import { setupChatHandlers } from './handlers.js';
+import { saveEvents } from './lib/lib.js';
 export function authenticateTwitch(): AuthProvider {
   const clientId = process.env.TWITCH_CLIENT_ID;
   const clientSecret = process.env.TWITCH_CLIENT_SECRET;

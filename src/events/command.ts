@@ -1,4 +1,4 @@
-import { knownCommands } from '../config';
+import { knownCommands } from '../config/config.js';
 
 export default function isCommand(text: string) {
   const [firstWord, ...rest] = text.split(' ');
