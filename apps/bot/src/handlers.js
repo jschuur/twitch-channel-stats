@@ -1,0 +1,60 @@
+// import { ApiClient } from '@twurple/api';
+import { boolean } from 'boolean';
+import pc from 'picocolors';
+import isCommand from './events/command.js';
+import { isDrop, isLanded } from './events/drop.js';
+import isMeme from './events/meme.js';
+import BatchProcess from './lib/batch.js';
+import { saveEvents } from './lib/lib.js';
+import { log } from './lib/util.js';
+// batch queue will save events every 10 seconds or when it reaches 50 events
+const batch = new BatchProcess(saveEvents, {
+    maxSize: 50,
+    maxTime: 10000,
+});
+export function setupChatHandlers(client) {
+    client.onMessage(onMessage);
+    client.onPart(onPart);
+    client.onJoin(onJoin);
+}
+// export function setupEventSubHandlers(apiClient: ApiClient) {
+// }
+export async function onJoin(channel, username) {
+    channel = channel.replace(/^#/, '');
+    log('join', channel, `${username} joined ${channel}`);
+}
+export async function onPart(channel, username) {
+    channel = channel.replace(/^#/, '');
+    log('part', channel, `${username} left ${channel}`);
+    saveEvents({ channel, username, type: 'part' });
+}
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function onMessage(channel, username, text, msg) {
+    channel = channel.replace(/^#/, '');
+    if (isDrop(text)) {
+        log('drop', channel, `${pc.green('Drop')} by ${username}: ${text}`);
+        return saveEvents({ type: 'drop', channel, text, username });
+    }
+    const meme = isMeme(text, channel);
+    if (meme) {
+        log('meme', channel, `${pc.magenta('Meme')} by ${username} ${text}`);
+        return saveEvents({ type: 'meme', channel, text, username });
+    }
+    const cmd = isCommand(text);
+    if (cmd) {
+        const { command, args } = cmd;
+        log('command', channel, `${pc.magenta('Command')} by ${username} ${text}`);
+        return saveEvents({ type: 'command', channel, text, context: { command, commandArgs: args } });
+    }
+    const landed = isLanded(text);
+    if (landed) {
+        const { username, score } = landed;
+        log('landed', channel, `${pc.magenta('Drop')} land by ${username} for ${score}`);
+        return await saveEvents({ type: 'landed', channel, text, context: { username, score } });
+    }
+    // treat it as a regular chat message
+    if (boolean(process.env.SAVE_MSG_LENGTHS)) {
+        batch.add({ type: 'msg', channel, username, context: { msgLength: text?.length || 0 } });
+    }
+    log('msg', channel, `${username}: ${text}`);
+}

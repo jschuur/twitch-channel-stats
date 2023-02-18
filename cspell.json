@@ -1,3 +1,3 @@
 {
-  "ignorePaths": ["node_modules/**", "src/config/memes.ts", "tsconfig.json"]
+  "ignorePaths": ["node_modules/**", "apps/bot/src/config/memes.ts", "tsconfig.json"]
 }
