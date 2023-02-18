@@ -42,6 +42,7 @@ export async function connectChat(
     await chatClient.connect();
 
     spinner.succeed(`Connected to chat (${pc.cyan(channels)})`);
+    console.log();
 
     for (const channel of channels.split(','))
       await saveEvents({ type: 'channel_join', channel: `#${channel}` });

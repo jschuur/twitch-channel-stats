@@ -1,5 +1,6 @@
 import { boolean } from 'boolean';
 import _ from 'lodash';
+import pc from 'picocolors';
 const { pick } = _;
 
 import { savedContextFields } from '../config/config.js';
@@ -34,9 +35,37 @@ export function validateOptions(options: CliOptions) {
     process.exit(1);
   }
 
-  if (!options.datasource) {
-    console.error('No TinyBird datasource specified');
+  if (!boolean(process.env.DISABLE_EVENT_SAVING)) {
+    if (!options.datasource) {
+      console.error('No TinyBird datasource specified');
 
-    process.exit(1);
+      process.exit(1);
+    }
   }
+}
+
+export function startupMessages() {
+  const envVars = [
+    ['TINYBIRD_API_KEY', 'TinyBird API key', 8],
+    ['TWITCH_CLIENT_ID', 'Twitch Client ID', 8],
+    ['DATABASE_URL', 'Database URL', 25],
+  ] as const;
+
+  const labelLength = Math.max(...envVars.map(([, label]) => label.length));
+
+  // partially preview some key env vars
+  envVars.forEach(([envVar, label, sliceLength]) => {
+    console.log(
+      `${label.padEnd(labelLength)} ${
+        process.env[envVar]
+          ? `${pc.green(process.env[envVar]?.slice(0, sliceLength as number))}...`
+          : pc.red('Not set')
+      }`
+    );
+  });
+
+  if (boolean(process.env.DISABLE_EVENT_SAVING))
+    console.log(`\n${pc.yellow('Notice')}: Event saving is disabled based on DISABLE_EVENT_SAVING`);
+
+  console.log();
 }

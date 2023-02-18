@@ -1,6 +1,5 @@
 // import { ApiClient } from '@twurple/api';
 // import { EventSubWsListener } from '@twurple/eventsub-ws';
-import { boolean } from 'boolean';
 import 'dotenv/config';
 import minimost from 'minimost';
 
@@ -23,9 +22,7 @@ const options = minimost(process.argv.slice(2), {
 
 (async () => {
   validateOptions(options);
-
-  if (boolean(process.env.DISABLE_EVENT_SAVING))
-    console.log(`{pc.yellow('Notice')}: Event saving is disabled based on DISABLE_EVENT_SAVING`);
+  startupMessages();
 
   global.options = options;
 
