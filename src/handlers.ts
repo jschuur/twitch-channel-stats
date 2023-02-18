@@ -47,7 +47,7 @@ export async function onMessage(channel: string, username: string, text: string,
     return saveEvents({ type: 'drop', channel, text, username });
   }
 
-  const meme = isMeme(text);
+  const meme = isMeme(text, channel);
   if (meme) {
     log('meme', channel, `${pc.magenta('Meme')} by ${username} ${text}`);
 
