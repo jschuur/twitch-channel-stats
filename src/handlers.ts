@@ -25,13 +25,13 @@ export function setupChatHandlers(client: ChatClient) {
 // }
 
 export async function onJoin(channel: string, username: string) {
-  channel = channel.replace('/^#', '');
+  channel = channel.replace(/^#/, '');
 
   log('join', channel, `${username} joined ${channel}`);
 }
 
 export async function onPart(channel: string, username: string) {
-  channel = channel.replace('/^#', '');
+  channel = channel.replace(/^#/, '');
 
   log('part', channel, `${username} left ${channel}`);
   saveEvents({ channel, username, type: 'part' });
@@ -39,7 +39,7 @@ export async function onPart(channel: string, username: string) {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function onMessage(channel: string, username: string, text: string, msg?: any) {
-  channel = channel.replace('/^#', '');
+  channel = channel.replace(/^#/, '');
 
   if (isDrop(text)) {
     log('drop', channel, `${pc.green('Drop')} by ${username}: ${text}`);
