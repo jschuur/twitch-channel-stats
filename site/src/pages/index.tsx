@@ -5,7 +5,7 @@ import MainDashboard from '~/components/MainDashboard';
 export default function HomePage() {
   return (
     <main className='p-6 sm:p-10'>
-      <Title>Oddly Specific Twitch Chat Stats</Title>
+      <Title>Some Twitch Channel Stats</Title>
       <Text>
         An experimental dashboard featuring{' '}
         <a href='https://www.twitch.tv/directory/game/Software%20and%20Game%20Development'>

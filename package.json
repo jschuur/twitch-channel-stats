@@ -1,7 +1,7 @@
 {
-  "name": "twitch-drop-stats",
+  "name": "twitch-channel-stats",
   "version": "1.0.0",
-  "description": "",
+  "description": "Channel/chat stats for (some) Twitch Software & Game Development streamers",
   "main": "index.js",
   "type": "module",
   "scripts": {
