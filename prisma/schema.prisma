@@ -7,12 +7,24 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model ChatMessage {
-  id        Int      @id @default(autoincrement())
-  type      String
-  channel   String
-  username  String?
-  context   Json?
-  text      String?
+model Channel {
+  id           Int     @id @default(autoincrement())
+  channelname  String
+  activeChat   Boolean @default(true)
+  activeEvents Boolean @default(true)
+
+  // Twitch API profile info
+  twitchId        String?
+  displayName     String
+  profileImageUrl String?
+  description     String?
+  broadcasterType String?
+  viewCount       Int?
+  followers       Int?
+
+  lastStreamedAt DateTime?
+  config         Json      @default("{}")
+
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

@@ -4,7 +4,8 @@ import pc from 'picocolors';
 const { pick } = _;
 
 import { savedContextFields } from '../config/config.js';
-import { ChatEvents, CliOptions } from './types.js';
+import { getActiveChannels } from '../stores/db.js';
+import { ChatEvents } from './types.js';
 
 import saveToTinyBird from '../stores/tinybird.js';
 
@@ -26,16 +27,6 @@ export const trimContext = (context: Record<string, any> | undefined) => {
   return pick(context, savedContextFields);
 };
 
-export function validateOptions(options: CliOptions) {
-  if (!boolean(process.env.DISABLE_EVENT_SAVING)) {
-    if (!options.datasource) {
-      console.error('No TinyBird datasource specified');
-
-      process.exit(1);
-    }
-  }
-}
-
 export function startupMessages() {
   const envVars = [
     ['TINYBIRD_API_KEY', 'TinyBird API key', 8],
@@ -47,12 +38,12 @@ export function startupMessages() {
 
   // partially preview some key env vars
   envVars.forEach(([envVar, label, sliceLength]) => {
+    if (!process.env[envVar]) throw new Error(`${envVar} undefined. Exiting.`);
+
     console.log(
-      `${label.padEnd(labelLength)} ${
-        process.env[envVar]
-          ? `${pc.green(process.env[envVar]?.slice(0, sliceLength as number))}...`
-          : pc.red('Not set')
-      }`
+      `${label.padEnd(labelLength)} ${`${pc.green(
+        process.env[envVar]?.slice(0, sliceLength as number)
+      )}...`}`
     );
   });
 
@@ -60,4 +51,16 @@ export function startupMessages() {
     console.log(`\n${pc.yellow('Notice')}: Event saving is disabled based on DISABLE_EVENT_SAVING`);
 
   console.log();
+}
+
+export async function getChannels() {
+  const channels = await getActiveChannels();
+
+  if (!channels.length) {
+    console.log(`${pc.red('Error')}: No channels to connect to. Exiting.`);
+
+    process.exit(0);
+  }
+
+  return channels;
 }

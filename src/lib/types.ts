@@ -1,6 +1,7 @@
-export type CliOptions = {
-  channels: string;
-  datasource: string;
+import { Channel as PrismaChannel } from '@prisma/client';
+
+export type Channel = PrismaChannel & {
+  config: Record<string, any>;
 };
 
 export type ChatEventType =

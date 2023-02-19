@@ -2,6 +2,7 @@ import { ChatClient } from '@twurple/chat';
 // import { ApiClient } from '@twurple/api';
 import { boolean } from 'boolean';
 import pc from 'picocolors';
+import { Channel } from './lib/types.js';
 
 import isCommand from './events/command.js';
 import { isDrop, isLanded } from './events/drop.js';
@@ -15,65 +16,94 @@ const batch = new BatchProcess(saveEvents as BatchCallback, {
   maxTime: 10000,
 });
 
-export function setupChatHandlers(client: ChatClient) {
+let connectedChannels: Channel[];
+
+const channelMatch = (channelname: string) =>
+  connectedChannels?.find((c) => c.channelname.toLowerCase() === channelname.toLowerCase());
+
+export function setupChatHandlers(client: ChatClient, channels: Channel[]) {
   client.onMessage(onMessage);
   client.onPart(onPart);
   client.onJoin(onJoin);
+
+  connectedChannels = channels;
 }
 
 // export function setupEventSubHandlers(apiClient: ApiClient) {
 // }
 
-export async function onJoin(channel: string, username: string) {
-  channel = channel.replace(/^#/, '');
+export async function onJoin(channelname: string, username: string) {
+  channelname = channelname.replace(/^#/, '');
 
-  log('join', channel, `${username} joined ${channel}`);
+  log('join', channelname, `${username} joined ${channelname}`);
 }
 
-export async function onPart(channel: string, username: string) {
-  channel = channel.replace(/^#/, '');
+export async function onPart(channelname: string, username: string) {
+  channelname = channelname.replace(/^#/, '');
 
-  log('part', channel, `${username} left ${channel}`);
-  saveEvents({ channel, username, type: 'part' });
+  log('part', channelname, `${username} left ${channelname}`);
+  saveEvents({ channel: channelname, username, type: 'part' });
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export async function onMessage(channel: string, username: string, text: string, msg?: any) {
-  channel = channel.replace(/^#/, '');
+export async function onMessage(channelname: string, username: string, text: string, msg?: any) {
+  channelname = channelname.replace(/^#/, '');
+  const channel = channelMatch(channelname);
+
+  if (!channel) {
+    console.log(`${pc.yellow('Warning')}: Unknown channel in event: ${channelname}`);
+
+    return;
+  }
 
   if (isDrop(text)) {
-    log('drop', channel, `${pc.green('Drop')} by ${username}: ${text}`);
+    log('drop', channelname, `${pc.green('Drop')} by ${username}: ${text}`);
 
-    return saveEvents({ type: 'drop', channel, text, username });
+    return saveEvents({ type: 'drop', channel: channelname, text, username });
   }
 
   const meme = isMeme(text, channel);
   if (meme) {
-    log('meme', channel, `${pc.magenta('Meme')} by ${username} ${text}`);
+    log('meme', channelname, `${pc.magenta('Meme')} by ${username} ${text}`);
 
-    return saveEvents({ type: 'meme', channel, text, username });
+    return saveEvents({ type: 'meme', channel: channelname, text, username });
   }
 
   const cmd = isCommand(text);
   if (cmd) {
     const { command, args } = cmd;
-    log('command', channel, `${pc.magenta('Command')} by ${username} ${text}`);
+    log('command', channelname, `${pc.magenta('Command')} by ${username} ${text}`);
 
-    return saveEvents({ type: 'command', channel, text, context: { command, commandArgs: args } });
+    return saveEvents({
+      type: 'command',
+      channel: channelname,
+      text,
+      context: { command, commandArgs: args },
+    });
   }
 
   const landed = isLanded(text);
   if (landed) {
     const { username, score } = landed;
 
-    log('landed', channel, `${pc.magenta('Drop')} land by ${username} for ${score}`);
+    log('landed', channelname, `${pc.magenta('Drop')} land by ${username} for ${score}`);
 
-    return await saveEvents({ type: 'landed', channel, text, context: { username, score } });
+    return await saveEvents({
+      type: 'landed',
+      channel: channelname,
+      text,
+      context: { username, score },
+    });
   }
 
   // treat it as a regular chat message
   if (boolean(process.env.SAVE_MSG_LENGTHS)) {
-    batch.add({ type: 'msg', channel, username, context: { msgLength: text?.length || 0 } });
+    batch.add({
+      type: 'msg',
+      channel: channelname,
+      username,
+      context: { msgLength: text?.length || 0 },
+    });
   }
-  log('msg', channel, `${username}: ${text}`);
+  log('msg', channelname, `${username}: ${text}`);
 }

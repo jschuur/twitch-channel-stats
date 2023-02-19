@@ -10,7 +10,7 @@ export default async function saveToTinyBird(events: ChatEvent[]) {
   const timestamp = new Date().toISOString();
   const timestampedEvents = events.map((event) => ({ ...event, timestamp }));
 
-  const rawResponse = await fetch(`${url}v0/events?name=${global.options.datasource}`, {
+  const rawResponse = await fetch(`${url}v0/events?name=${process.env.TINYBIRD_DATASOURCE}`, {
     method: 'POST',
     body: timestampedEvents.map((e) => JSON.stringify(e)).join('\n'),
     headers: headers,
