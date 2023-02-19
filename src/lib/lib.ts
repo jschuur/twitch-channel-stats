@@ -6,11 +6,11 @@ const { pick } = _;
 import { savedContextFields } from '../config/config.js';
 import { ChatEvents, CliOptions } from './types.js';
 
-import saveToDB from '../stores/db.js';
 import saveToTinyBird from '../stores/tinybird.js';
 
-export async function saveEvents(payload: ChatEvents) {
-  if (boolean(process.env.DISABLE_EVENT_SAVING)) return;
+// wrapper to saver channel events to Tinybird
+export function saveEvents(payload: ChatEvents) {
+  if (boolean(process.env.DISABLE_EVENT_SAVING) || !process.env.TINYBIRD_API_KEY) return;
 
   const events = Array.isArray(payload) ? payload : [payload];
 
@@ -18,9 +18,7 @@ export async function saveEvents(payload: ChatEvents) {
     event.context = trimContext(event.context);
   });
 
-  // save to data sources if defined
-  if (process.env.TINYBIRD_API_KEY) await saveToTinyBird(events);
-  if (process.env.DATABASE_URL) await saveToDB(events);
+  return saveToTinyBird(events);
 }
 
 // we don't want to save all the Twitch context, just the fields we care about
@@ -29,12 +27,6 @@ export const trimContext = (context: Record<string, any> | undefined) => {
 };
 
 export function validateOptions(options: CliOptions) {
-  if (!options.channels) {
-    console.error('No Twitch channels specified');
-
-    process.exit(1);
-  }
-
   if (!boolean(process.env.DISABLE_EVENT_SAVING)) {
     if (!options.datasource) {
       console.error('No TinyBird datasource specified');
