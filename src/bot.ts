@@ -1,20 +1,44 @@
-// import { ApiClient } from '@twurple/api';
-// import { EventSubWsListener } from '@twurple/eventsub-ws';
 import 'dotenv/config';
+import minimost from 'minimost';
 import pc from 'picocolors';
 
 import { startupMessages } from './lib/lib.js';
+import { Channel, CliOptions } from './lib/types.js';
 import { errorMessage } from './lib/util.js';
-import { getActiveChannels } from './stores/db.js';
-import { authenticateTwitch, connectChat } from './twitch.js';
+import { getChannels } from './stores/db.js';
+import {
+  authenticateTwitch,
+  connectChat,
+  showOnlineChannels,
+  updateChannelInfo,
+} from './twitch.js';
+
+const options = minimost(process.argv.slice(2), {
+  boolean: ['update-only'],
+  alias: {
+    u: 'update-only',
+  },
+}).flags as CliOptions;
 
 (async () => {
   try {
-    startupMessages();
+    const channels = await getChannels();
 
-    const channels = await getActiveChannels();
+    startupMessages(channels);
+
     const authProvider = authenticateTwitch();
-    await connectChat(authProvider, channels);
+
+    await updateChannelInfo(authProvider, channels);
+    await showOnlineChannels(authProvider, channels);
+
+    // -u exits here
+    if (options.updateOnly) process.exit(0);
+
+    // connect to just active channels
+    await connectChat(
+      authProvider,
+      channels.filter((c: Channel) => c.activeChat)
+    );
   } catch (error) {
     console.error(`${pc.red('Error')}: ${errorMessage(error)}`);
   }

@@ -1,5 +1,9 @@
 import { Channel as PrismaChannel } from '@prisma/client';
 
+export type CliOptions = {
+  updateOnly: boolean;
+};
+
 export type Channel = PrismaChannel & {
   config: Record<string, any>;
 };

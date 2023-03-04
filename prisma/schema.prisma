@@ -14,13 +14,14 @@ model Channel {
   activeEvents Boolean @default(true)
 
   // Twitch API profile info
-  twitchId        String?
+  twitchId        String    @unique
   displayName     String
   profileImageUrl String?
   description     String?
   broadcasterType String?
   viewCount       Int?
   followers       Int?
+  creationDate    DateTime?
 
   lastStreamedAt DateTime?
   config         Json      @default("{}")

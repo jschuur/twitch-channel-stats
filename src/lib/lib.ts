@@ -1,11 +1,12 @@
 import { boolean } from 'boolean';
 import _ from 'lodash';
 import pc from 'picocolors';
+import pluralize from 'pluralize';
 const { pick } = _;
 
 import { savedContextFields } from '../config/config.js';
 import { getActiveChannels } from '../stores/db.js';
-import { ChatEvents } from './types.js';
+import { Channel, ChatEvents } from './types.js';
 
 import saveToTinyBird from '../stores/tinybird.js';
 
@@ -27,7 +28,7 @@ export const trimContext = (context: Record<string, any> | undefined) => {
   return pick(context, savedContextFields);
 };
 
-export function startupMessages() {
+export function startupMessages(channels: Channel[]) {
   const envVars = [
     ['TINYBIRD_API_KEY', 'TinyBird API key', 8],
     ['TWITCH_CLIENT_ID', 'Twitch Client ID', 8],
@@ -46,6 +47,15 @@ export function startupMessages() {
       )}...`}`
     );
   });
+
+  const chatActiveCount = channels.filter((channel) => channel.activeChat)?.length || 0;
+  const eventSubActiveCount = channels.filter((channel) => channel.activeEvents)?.length || 0;
+
+  console.log(
+    `\nUsing ${pluralize('channel', channels.length, true)} (${pc.cyan(
+      chatActiveCount
+    )} activeChat, ${pc.cyan(eventSubActiveCount)} activeEvents)`
+  );
 
   if (boolean(process.env.DISABLE_EVENT_SAVING))
     console.log(`\n${pc.yellow('Notice')}: Event saving is disabled based on DISABLE_EVENT_SAVING`);

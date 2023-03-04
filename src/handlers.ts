@@ -1,15 +1,15 @@
 import { ChatClient } from '@twurple/chat';
-// import { ApiClient } from '@twurple/api';
 import { boolean } from 'boolean';
 import pc from 'picocolors';
-import { Channel } from './lib/types.js';
 
 import isCommand from './events/command.js';
 import { isDrop, isLanded } from './events/drop.js';
 import isMeme from './events/meme.js';
-import BatchProcess, { BatchCallback } from './lib/batch.js';
+import { BatchCallback, BatchProcess } from './lib/batch.js';
 import { saveEvents } from './lib/lib.js';
+import { Channel } from './lib/types.js';
 import { log } from './lib/util.js';
+
 // batch queue will save events every 10 seconds or when it reaches 50 events
 const batch = new BatchProcess(saveEvents as BatchCallback, {
   maxSize: 50,
@@ -28,9 +28,6 @@ export function setupChatHandlers(client: ChatClient, channels: Channel[]) {
 
   connectedChannels = channels;
 }
-
-// export function setupEventSubHandlers(apiClient: ApiClient) {
-// }
 
 export async function onJoin(channelname: string, username: string) {
   channelname = channelname.replace(/^#/, '');

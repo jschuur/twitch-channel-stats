@@ -8,7 +8,7 @@ interface BatchProcessOptions {
 }
 
 // a simple queue to batch process data at a given interval
-export default class BatchProcess {
+export class BatchProcess {
   private queue: any[] = [];
 
   private callback: BatchCallback;
